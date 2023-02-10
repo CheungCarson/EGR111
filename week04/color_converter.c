@@ -7,22 +7,21 @@
 
 int main(void)
 {
-    char color_code[7];
+    char rgb_delimiter;
     int red, green, blue;
     double r_arithmetic, g_arithmetic, b_arithmetic;
     int r_percentage, g_percentage, b_percentage;
     double cyan, magenta, yellow, black;
 
     printf("Enter the RGB color code to convert: (#000000)\nColor Code: ");
-    scanf("%s", color_code);
+    scanf("%c%02x%02x%02x", &rgb_delimiter, &red, &green, &blue);
     // Input validation
-    while (color_code[0] != '#')
+    while (rgb_delimiter != '#')
     {
         printf("Invalid\n");
         printf("Enter the RGB color code to convert: (#000000)\nColor Code: ");
-        scanf("%s", color_code);
+        scanf("%c%02x%02x%02x", &rgb_delimiter, &red, &green, &blue);
     }
-    sscanf(color_code, "#%2x%2x%2x", &red, &green, &blue);
 
     int rgb_value = (red * 65536) + (green * 256) + blue;
     printf("RGB Value: %d\n", rgb_value);

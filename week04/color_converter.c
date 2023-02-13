@@ -24,23 +24,24 @@ int main(void)
     }
 
     int rgb_value = (red * 65536) + (green * 256) + blue;
-    printf("RGB Value: %d\n", rgb_value);
 
     r_arithmetic = (double)red / 255;
     g_arithmetic = (double)green / 255;
     b_arithmetic = (double)blue / 255;
-    printf("RGB Arithmetic: (%.1lf, %.1lf, %.1lf)\n", r_arithmetic, g_arithmetic, b_arithmetic);
 
     r_percentage = r_arithmetic * 100;
     g_percentage = g_arithmetic * 100;
     b_percentage = b_arithmetic * 100;
-    printf("RGB Percentage: (%d%%, %d%%, %d%%)\n", r_percentage, g_percentage, b_percentage);
 
+    printf("RGB Value: %d\n", rgb_value);
+    printf("RGB Arithmetic: (%.1lf, %.1lf, %.1lf)\n", r_arithmetic, g_arithmetic, b_arithmetic);
+    printf("RGB Percentage: (%d%%, %d%%, %d%%)\n", r_percentage, g_percentage, b_percentage);
     printf("RGB 8-Bit: (%d, %d, %d)\n", red, green, blue);
 
     // Finding min black value
-    // I looked into the equation, because it was not giving me the right answer,-
-    // and I found out that you are supposed to use the min value between the three black values of the indiviual colors.
+    // I looked into the equation for calculating black(K), because it was not giving me the right answer,-
+    // and I found out that you can use the min value between the three black values of the indiviual colors.
+    // This is overkill but I couldn't figure anything else out.
     double lowest_black[3];
     lowest_black[0] = 1 - r_arithmetic;
     lowest_black[1] = 1 - g_arithmetic;

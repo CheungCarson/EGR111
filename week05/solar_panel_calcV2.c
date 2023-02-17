@@ -46,7 +46,7 @@ char get_build_type()
     char build_type = ' ';
     while (build_type != 'R' && build_type != 'C')
     {
-        printf("Residential(R) or Comercial(C) install? %c", getchar());
+        printf("Residential(R) or Comercial(C) install? %c", getchar()); // this was very difficult
         build_type = getchar();
         build_type = toupper(build_type);
         if (build_type != 'R' && build_type != 'C' && build_type != ' ')

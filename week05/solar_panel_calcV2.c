@@ -1,62 +1,108 @@
-// SolarPanelCalculator
-// This program determines what orientation of solar panels allows you to fit the most, how many solar panels fit on the given roof, and the final weight.
-// Carson Cheung 02/02/23
-
+// Solar Panel Calculator - Version 2.0
+// Refactors V1 solution to use functions
+// main() function is provided. You create others as defined in main.
+// Name:
+// Date:
 #include <stdio.h>
+#include <ctype.h> //research toupper()
 
-int main()
+const char BUILD_TYPE_RESIDENTIAL = 'R';
+const char BUILD_TYPE_COMMERCIAL = 'C';
+const int SIDEWALL_MIN = 30;
+const int SIDEWALL_MAX = 120;
+const int ENDWALL_MIN = 20;
+const int ENDWALL_MAX = 60;
+
+double get_sidewall()
 {
-    const int PANEL_WIDTH = 39;
-    const int PANEL_HEIGHT_RES = 65;
-    const int PANEL_HEIGHT_COM = 78;
-    const double PANEL_WEIGHT_RES = 40;
-    const double PANEL_WEIGHT_COM = 40;
-
-    // Panel results
-    int hor_cnt_panel_vert, hor_cnt_panel_hor, vert_cnt_panel_vert, vert_cnt_panel_hor, total_cnt_panel_vert, total_cnt_panel_hor, total_cnt;
-
-    // weights
-    double total_weight, weight_per_sq_ft;
-
-    // Building dimensions
-    double sidewall, endwall;
-
-    printf("Enter length for the side wall in feet: ");
+    double sidewall;
+    printf("Please enter sidewall length: ");
     scanf("%lf", &sidewall);
-    printf("Enter length for the end wall in feet: ");
+    while (sidewall > SIDEWALL_MAX || sidewall < SIDEWALL_MIN)
+    {
+        printf("Invalid input\n");
+        printf("Please enter sidewall length: ");
+        scanf("%lf", &sidewall);
+    }
+    return sidewall;
+}
+
+double get_endwall()
+{
+    double endwall;
+    printf("Please enter endwall length: ");
     scanf("%lf", &endwall);
-
-    double roof_width = (endwall / 2) * 12;
-    // Converting to inches
-    sidewall = sidewall * 12;
-
-    // Calcuating panels in the horizontal position
-    hor_cnt_panel_hor = sidewall / PANEL_HEIGHT_RES;
-    vert_cnt_panel_hor = roof_width / PANEL_WIDTH;
-    total_cnt_panel_hor = (int)hor_cnt_panel_hor * vert_cnt_panel_hor;
-
-    // Calculating panels in the vertical position
-    hor_cnt_panel_vert = sidewall / PANEL_WIDTH;
-    vert_cnt_panel_vert = roof_width / PANEL_HEIGHT_RES;
-    total_cnt_panel_vert = (int)hor_cnt_panel_vert * vert_cnt_panel_vert;
-
-    if (total_cnt_panel_hor > total_cnt_panel_vert)
+    while (endwall > ENDWALL_MAX || endwall < ENDWALL_MIN)
     {
-        total_cnt = total_cnt_panel_hor;
-        printf("The best way is to use %d panels in the horizontal orientation\n", total_cnt);
+        printf("Invalid input\n");
+        printf("Please enter endwall length: ");
+        scanf("%lf", &endwall);
     }
-    else
+    return endwall;
+}
+
+char get_build_type()
+{
+    char build_type = ' ';
+    while (build_type != 'R' && build_type != 'C')
     {
-        total_cnt = total_cnt_panel_vert;
-        printf("The best way is to use %d panels in the vertical orientation\n", total_cnt);
+        printf("Residential(R) or Comercial(C) install? %c", getchar());
+        build_type = getchar();
+        build_type = toupper(build_type);
+        if (build_type != 'R' && build_type != 'C' && build_type != ' ')
+        {
+            printf("Invalid Entry\n\n");
+        }
     }
+    return build_type;
+}
 
-    // Calculating weight
-    total_weight = total_cnt * PANEL_WEIGHT_RES;
-    total_weight = total_weight + (total_weight * 0.05);
-    weight_per_sq_ft = (sidewall * roof_width) / total_weight;
+int get_panel_count(double sidewall, double roof_width, int x, int y)
+{
+    int x_count = roof_width / (x / 12);
+    int y_count = sidewall / (y / 12);
+    int total_cnt = x_count * y_count;
+    return total_cnt;
+}
 
-    // Outputs
-    printf("The total weight is %.1lf pounds\n", total_weight);
-    printf("The load on your roof is %.1lf per square foot\n", weight_per_sq_ft);
+void display_output(int panel_count, double weight, double load)
+{
+    printf("Total panels: %d\n", panel_count);
+    printf("Total weight; %.1lf lbs\n", weight);
+    printf("Load: %.1lf lb/ft^2", load);
+}
+
+void main(void)
+{
+    // Main function is provided. No edits here.
+    // Implement required functions based on calls below.
+    const int PANEL_WIDTH = 39;      // inches
+    const int PANEL_HEIGHT_RES = 65; // inches
+    const int PANEL_HEIGHT_COM = 78; // inches
+    const int PANEL_WEIGHT_RES = 42; // pounds
+    const int PANEL_WEIGHT_COM = 50; // pounds
+
+    double sidewall, endwall;
+    int panel_height, panel_weight;
+    char build_type;
+    int panel_count_vert, panel_count_hor, panel_count;
+
+    printf("Solar Panel Calculator\n");
+    printf("\n");
+
+    sidewall = get_sidewall(); // valid user input using min and max
+    endwall = get_endwall();   // valid user input using min and max
+
+    build_type = get_build_type();
+    panel_height = (build_type == BUILD_TYPE_COMMERCIAL) ? PANEL_HEIGHT_COM : PANEL_HEIGHT_RES;
+    panel_weight = (build_type == BUILD_TYPE_COMMERCIAL) ? PANEL_WEIGHT_COM : PANEL_WEIGHT_RES;
+
+    panel_count_vert = get_panel_count(sidewall, endwall / 2, PANEL_WIDTH, panel_height);
+    panel_count_hor = get_panel_count(sidewall, endwall / 2, panel_height, PANEL_WIDTH);
+
+    panel_count = (panel_count_vert >= panel_count_hor) ? panel_count_vert : panel_count_hor;
+    double total_weight = 1.05 * panel_count * panel_weight; // add 5% for mounting hardware
+    double load = total_weight / (sidewall * endwall / 2);
+
+    display_output(panel_count, total_weight, load);
 }

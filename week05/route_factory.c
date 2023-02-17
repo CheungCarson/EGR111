@@ -9,24 +9,25 @@
 #include <stdbool.h>
 #include <time.h>
 
+//Field dimensions
 #define H_SIZE 32
 #define V_SIZE H_SIZE / 2
-
+//Characters for drawing the field
 const char CLOSED = '#';
 const char OPEN = ' ';
 const char START = 'O';
-char field[V_SIZE][H_SIZE];
+char field[V_SIZE][H_SIZE];//defining field
 
-void make_field()
+void make_field()//Fills the entire field with '#'
 {
-    for (int r = 0; r < V_SIZE; r++)
-        for (int c = 0; c < H_SIZE; c++)
+    for (int r = 0; r < V_SIZE; r++)//steps through all horizontal rows
+        for (int c = 0; c < H_SIZE; c++)//fills the horizontal rows
             field[r][c] = CLOSED;
 }
 
-void display_field()
+void display_field()//displays the field to the terminal
 {
-    // system("clear");
+    system("clear");
     for (int r = 0; r < V_SIZE; r++)
     {
         for (int c = 0; c < H_SIZE; c++)

@@ -27,7 +27,7 @@ void make_field()//Fills the entire field with '#'
 
 void display_field()//displays the field to the terminal
 {
-    system("clear");
+    system("clear");//clears the system terminal
     for (int r = 0; r < V_SIZE; r++)
     {
         for (int c = 0; c < H_SIZE; c++)

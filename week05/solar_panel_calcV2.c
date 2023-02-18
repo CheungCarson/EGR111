@@ -1,8 +1,8 @@
 // Solar Panel Calculator - Version 2.0
 // Refactors V1 solution to use functions
 // main() function is provided. You create others as defined in main.
-// Name:
-// Date:
+// Name: Carson Cheung
+// Date: 2/17/23
 #include <stdio.h>
 #include <ctype.h> //research toupper()
 

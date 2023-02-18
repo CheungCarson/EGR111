@@ -9,34 +9,34 @@
 #include <stdbool.h>
 #include <time.h>
 
-//Field dimensions
+// Field dimensions
 #define H_SIZE 32
 #define V_SIZE H_SIZE / 2
-//Characters for drawing the field
+// Characters for drawing the field
 const char CLOSED = '#';
 const char OPEN = ' ';
 const char START = 'O';
-char field[V_SIZE][H_SIZE];//defining field
+char field[V_SIZE][H_SIZE]; // defining field
 
-void make_field()//Fills the entire field with '#'
+void make_field() // Fills the entire field with '#'
 {
-    for (int r = 0; r < V_SIZE; r++)//steps through all horizontal rows
-        for (int c = 0; c < H_SIZE; c++)//fills the horizontal rows
+    for (int r = 0; r < V_SIZE; r++)     // steps through all horizontal rows
+        for (int c = 0; c < H_SIZE; c++) // fills the horizontal rows
             field[r][c] = CLOSED;
 }
 
-void display_field()//displays the field to the terminal
+void display_field() // displays the field to the terminal
 {
-    system("clear");//clears the system terminal
-    for (int r = 0; r < V_SIZE; r++)
+    system("clear");                 // clears the system terminal
+    for (int r = 0; r < V_SIZE; r++) // steps through horizontal lines
     {
-        for (int c = 0; c < H_SIZE; c++)
+        for (int c = 0; c < H_SIZE; c++) // draws character for each space
             printf("%c", field[r][c]);
         printf("\n");
     }
 }
 
-int get_next_index(int current)
+int get_next_index(int current) // determine which direction the next move is in
 {
     // 50% chance no move, %25 forward, 25% backward
     int random = rand();
@@ -45,7 +45,7 @@ int get_next_index(int current)
     return current + delta;
 }
 
-bool is_valid_space(int row, int col, char mark)
+bool is_valid_space(int row, int col, char mark) // checks to see if the next space is open to move to
 {
     bool return_val = false;
     if (row < 0)
@@ -63,13 +63,15 @@ bool is_valid_space(int row, int col, char mark)
     return return_val;
 }
 
-bool is_remote_space(int row, int col)
+bool is_remote_space(int row, int col) // checks if adjacent spaces are open
 {
     int adjacent_closed_spaces = 0;
+    // checks row spaces
     if (is_valid_space(row + 1, col, CLOSED))
         adjacent_closed_spaces++;
     if (is_valid_space(row - 1, col, CLOSED))
         adjacent_closed_spaces++;
+    // checks coloumn spcaces
     if (is_valid_space(row, col + 1, CLOSED))
         adjacent_closed_spaces++;
     if (is_valid_space(row, col - 1, CLOSED))
@@ -78,7 +80,7 @@ bool is_remote_space(int row, int col)
     return adjacent_closed_spaces >= 3;
 }
 
-int make_route(int row, int col, const int ROUTE_LENGTH)
+int make_route(int row, int col, const int ROUTE_LENGTH) // creates route until it runs out of tries
 {
     int try_count = ROUTE_LENGTH * 10;
     int next_row, next_col;
@@ -86,7 +88,7 @@ int make_route(int row, int col, const int ROUTE_LENGTH)
     int tries = 0;
 
     field[row][col] = START;
-    while (length < ROUTE_LENGTH && tries < try_count)
+    while (length < ROUTE_LENGTH && tries < try_count) // runs until its reached the route length and its run out of tries
     {
         next_row = get_next_index(row);
         if (next_row == row) // no vertical move so then horizontal
@@ -113,7 +115,7 @@ void main()
     int length = 0;
 
     srand(time(0));
-    while (length < PATH_LENGTH / 2)
+    while (length < PATH_LENGTH / 2) // Runs until its length is half the path length
     {
         make_field();
         length = make_route(V_SIZE / 2, H_SIZE / 2, PATH_LENGTH);

@@ -18,7 +18,7 @@ char board[3][3] = {
 };
 int turn = 1;
 
-void show_directions()
+void show_game()
 {
     printf("  TIC TAC TOE\n\n");
 }
@@ -138,12 +138,13 @@ void main()
     while (game_over == false)
     {
         draw_board();
-        show_directions();
+        show_game();
         choose_player();
         play();
         check_game_over(current_player, &game_over, &player_win);
     }
 
     draw_board();
+    show_game();
     (player_win == true) ? printf("\nCongratulations player %c you won!!\n", current_player) : printf("\nIt's a Cats game!\n");
 }

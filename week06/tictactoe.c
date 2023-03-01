@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #define PLAYER_X 'X'
 #define PLAYER_O 'O'
@@ -43,19 +44,19 @@ void first_player()
 {
     char input = ' ';
 
-    //Gets input and validates
+    // Gets input and validates
     while (input != 'X' && input != 'O')
     {
         printf("Select Xs or Os (X, O): ");
         input = getchar();
-        input = toupper(input);//This gives error for some reason but its fine
+        input = toupper(input);
         if (input != 'X' && input != 'O')
             printf("Invalid entry!\n");
         printf("\n");
         getchar();
     }
 
-    //Sets players
+    // Sets players
     if (input == 'X')
     {
         player1 = PLAYER_X;
@@ -67,13 +68,13 @@ void first_player()
         player2 = PLAYER_X;
     }
 
-    //Prints which player is which
+    // Prints which player is which
     printf("Player 1 is %c\nPlayer 2 is %c\n\n", player1, player2);
 }
 
 void player_turn() // Alternates between player turns (Always starts with PLAYER_X)
 {
-    
+
     // player1 = PLAYER_X;
     // player2 = PLAYER_O;
 
@@ -168,7 +169,7 @@ void main()
     bool game_over = false;
     bool player_win = false;
     first_player();
-    
+
     while (game_over == false)
     {
         draw_board();

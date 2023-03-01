@@ -39,10 +39,43 @@ void draw_board()
     }
 }
 
-void choose_player() // Alternates between player turns (Always starts with PLAYER_X)
+void first_player()
 {
-    player1 = PLAYER_X;
-    player2 = PLAYER_O;
+    char input = ' ';
+
+    //Gets input and validates
+    while (input != 'X' && input != 'O')
+    {
+        printf("Select Xs or Os (X, O): ");
+        input = getchar();
+        input = toupper(input);
+        if (input != 'X' && input != 'O')
+            printf("Invalid entry!\n");
+        printf("\n");
+        getchar();
+    }
+
+    //Sets players
+    if (input == 'X')
+    {
+        player1 = PLAYER_X;
+        player2 = PLAYER_O;
+    }
+    else if (input == 'O')
+    {
+        player1 = PLAYER_O;
+        player2 = PLAYER_X;
+    }
+
+    //Prints which player is which
+    printf("Player 1 is %c\nPlayer 2 is %c\n\n", player1, player2);
+}
+
+void player_turn() // Alternates between player turns (Always starts with PLAYER_X)
+{
+    
+    // player1 = PLAYER_X;
+    // player2 = PLAYER_O;
 
     turn++;
     if (turn % 2 == 0)
@@ -134,12 +167,13 @@ void main()
 {
     bool game_over = false;
     bool player_win = false;
-
+    first_player();
+    
     while (game_over == false)
     {
         draw_board();
         show_game();
-        choose_player();
+        player_turn();
         play();
         check_game_over(current_player, &game_over, &player_win);
     }

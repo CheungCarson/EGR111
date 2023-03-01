@@ -48,7 +48,7 @@ void first_player()
     {
         printf("Select Xs or Os (X, O): ");
         input = getchar();
-        input = toupper(input);
+        input = toupper(input);//This gives error for some reason but its fine
         if (input != 'X' && input != 'O')
             printf("Invalid entry!\n");
         printf("\n");

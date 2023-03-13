@@ -34,15 +34,23 @@ void test_can_choose_players(void)
 void test_can_select_first_player()
 {
     // arrange
-
+    char player;
     // act
-
+    player = select_first_player();
     // assert
+    TEST_CHECK(player == PLAYER_O || player == PLAYER_X);
 }
+
+void test_can_get_move()
+{
+    // Im not really sure how to do this one
+}
+
 // List of tests - key, value pairs with {NULL, NULL} termination.
 TEST_LIST = {
     {"first test", test_can_clear_board},
     {"can choose player", test_can_choose_players},
+    {"can select first player", test_can_select_first_player},
     {NULL, NULL}};
 
 #endif

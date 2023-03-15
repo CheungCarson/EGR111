@@ -7,11 +7,11 @@ void deck_factory(char deck[DECK_SIZE][CARD_SIZE])
     char ranks[] = RANKS;
     int cards = 0;
 
-    while (cards <= DECK_SIZE)
+    while (cards < DECK_SIZE)
     {
-        for (int s = 0; s <= 4; s++)
+        for (int s = 0; s < 4; s++)
         {
-            for (int r = 0; r <= 13; r++)
+            for (int r = 0; r < 13; r++)
             {
                 deck[cards][0] = suits[s];
                 deck[cards][1] = ranks[r];

@@ -24,9 +24,20 @@ void deck_factory(char deck[DECK_SIZE][CARD_SIZE])
 
 void shuffle(char deck[DECK_SIZE][CARD_SIZE])
 {
-    // random num gen
-    // switch first card w/ random card
-    // Checks first two cards
+    srand(time(NULL));
+    for (int i = 0; i < DECK_SIZE; i++)
+    {
+        int r = rand() % (52);
+        char temp_arr[2];
+        temp_arr[0] = deck[r][0];
+        temp_arr[1] = deck[r][1];
+
+        deck[r][0] = deck[i][0];
+        deck[r][1] = deck[i][1];
+
+        deck[i][0] = temp_arr[0];
+        deck[i][1] = temp_arr[1];
+    }
 }
 
 void deal_card(char deck[DECK_SIZE][CARD_SIZE], char card[CARD_SIZE]) // returns first non-blank card in deck

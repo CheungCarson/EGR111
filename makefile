@@ -8,7 +8,7 @@
 # 3. Only one main() function with int return
 # 4. Use subdirectories as required
 # 5. *** src_dir must be updated ***
-src_dir = week08/ttt
+src_dir = week09/carddeck
 
 CC        := g++
 C_FLAGS := -std=c++17 -ggdb

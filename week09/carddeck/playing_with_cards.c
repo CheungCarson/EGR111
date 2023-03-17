@@ -4,9 +4,11 @@
 
 int main()
 {
+    char card[3];
     char deck[DECK_SIZE][CARD_SIZE];
     deck_factory(deck);
     shuffle(deck);
+    deal_card(deck, card);
 
     for (int i = 0; i < DECK_SIZE; i++)
     {
@@ -14,6 +16,7 @@ int main()
         printf("%c", deck[i][1]);
         printf("\n");
     }
+    printf("your card is: %c%c", card[0], card[1]);
 }
 
 #endif

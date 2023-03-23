@@ -5,6 +5,7 @@
 int main()
 {
     char card[3];
+    char hand[7][CARD_SIZE];
     char deck[DECK_SIZE][CARD_SIZE];
     deck_factory(deck);
     shuffle(deck);

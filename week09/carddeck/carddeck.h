@@ -7,7 +7,7 @@
 #define TESTING false
 
 #define DECK_SIZE 52
-// #define DECK_SIZE 52 * 2
+#define START_HAND 2
 #define CARD_SIZE 3 // rank + suit + null
 #define SUITS {'c', 'd', 'h', 's'};
 #define RANKS {'2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'};

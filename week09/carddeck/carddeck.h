@@ -19,3 +19,6 @@ void deal_hand(char deck[DECK_SIZE][CARD_SIZE], char hand[][CARD_SIZE], int hand
 int get_card_value(char card[CARD_SIZE]);
 int get_hand_value(char hand[][CARD_SIZE], int hand_size);
 bool is_ace(char card[CARD_SIZE]);
+void print_table(char dealer_hand[10][CARD_SIZE], char player_hand[10][CARD_SIZE], int d_cards, int p_cards);
+void print_card(char card[CARD_SIZE]);
+void print_hand(char hand[][CARD_SIZE], int handSize);

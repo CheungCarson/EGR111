@@ -2,6 +2,8 @@
 
 void intro()
 {
+    printf("\e[1;1H\e[2J"); // Clear Screen
+
     printf("      _____\n"); // print cards
     printf("     |A .  | _____\n");
     printf("     | /.\\ ||A ^  | _____\n");
@@ -27,7 +29,7 @@ void intro()
 
     printf("\nThe goal of the game is to get as close to 21 points without going over\n"); // instructions
     printf("Number cards are worth their face value and face cards are all worth 10 points\n");
-    printf("Aces are worth 11 points unless that pushes you over into a bust, then they are 1 point\n");
+    printf("Aces are worth 11 points unless that pushes you over into a bust, then they are 1 point\n"); // To-Do: correct and rewrite
     printf("The first player is the dealer and the dealer wins ties\n");
     printf("You are dealt 2 cards two start and will take turns drwing cards until both players have either busted or passed\n");
 
@@ -40,12 +42,25 @@ void print_table(char dealer_hand[10][CARD_SIZE], char player_hand[10][CARD_SIZE
     printf("\e[1;1H\e[2J"); // Clear Screen
 
     printf("Dealer's hand:\n");
-    print_hand(dealer_hand, d_cards);
-    printf("\nScore: %d\n", get_hand_value(dealer_hand, d_cards));
+    print_dealer_hand(dealer_hand[0]);
+    printf("\nScore: %d\n", get_card_value(dealer_hand[0]));
 
     printf("\nPlayer's hand:\n");
     print_hand(player_hand, p_cards);
     printf("\nScore: %d\n", get_hand_value(player_hand, p_cards));
+}
+
+bool player_done(char hand[][CARD_SIZE], int card_count, bool *bust, bool *blackjack)
+{
+    int score = get_hand_value(hand, card_count);
+    if (score == 21)
+        *blackjack = true;
+    if (score >= 21)
+        *bust = true;
+}
+
+void player_turn()
+{
 }
 
 void deck_factory(char deck[DECK_SIZE][CARD_SIZE]) // Creats deck
@@ -86,67 +101,115 @@ void shuffle(char deck[DECK_SIZE][CARD_SIZE]) // shuffles deck
 
 void print_hand(char hand[][CARD_SIZE], int handSize)
 {
+
     for (int i = 0; i < handSize; i++)
         printf(" ___   ");
     printf("\n");
 
     for (int i = 0; i < handSize; i++)
-        printf("|%c  |  ", hand[i][0]);
-    printf("\n");
-
-    for (int i = 0; i < handSize; i++)
     {
-        printf("| ");
-        switch (hand[i][1])
-        {
-        case 'd':
-            printf("♦");
-            break;
-        case 'h':
-            printf("♥");
-            break;
-        case 's':
-            printf("♠");
-            break;
-        case 'c':
-            printf("♣");
-            break;
-        default:
-            break;
-        }
-        printf(" |  ");
+        if (hand[i][0] == 'T')
+            printf("|10 |  ");
+        else
+            printf("|%c  |  ", hand[i][0]);
     }
     printf("\n");
 
     for (int i = 0; i < handSize; i++)
-        printf("|__%c|  ", hand[i][0]);
+    {
+        switch (hand[i][1])
+        {
+        case 'd':
+            printf("| ♦ |  ");
+            break;
+        case 'h':
+            printf("| ♥ |  ");
+            break;
+        case 's':
+            printf("| ♠ |  ");
+            break;
+        case 'c':
+            printf("| ♣ |  ");
+            break;
+        default:
+            break;
+        }
+    }
+    printf("\n");
+
+    for (int i = 0; i < handSize; i++)
+    {
+        if (hand[i][0] == 'T')
+            printf("|_10|  ");
+        else
+            printf("|__%c|  ", hand[i][0]);
+    }
     printf("\n");
 }
 
 void print_card(char card[CARD_SIZE])
 {
+    char r = card[0];
+
     printf(" ___\n");
-    printf("|%c  |\n", card[0]);
-    printf("| ");
+    if (r == 'T')
+        printf("|10  |\n");
+    else
+        printf("|%c  |\n", card[0]);
     switch (card[1])
     {
     case 'd':
-        printf("♦");
+        printf("| ♦ |\n");
         break;
     case 'h':
-        printf("♥");
+        printf("| ♥ |\n");
         break;
     case 's':
-        printf("♠");
+        printf("| ♠ |\n");
         break;
     case 'c':
-        printf("♣");
+        printf("| ♣ |\n");
         break;
     default:
         break;
     }
-    printf(" |\n");
-    printf("|__%c|\n", card[0]);
+    if (r == 'T')
+        printf("|_10|\n");
+    else
+        printf("|__%c|\n", card[0]);
+}
+
+void print_dealer_hand(char card[CARD_SIZE])
+{
+    char r = card[0];
+
+    printf(" ___    ___\n");
+    if (r == 'T')
+        printf("|10 |  |?  |\n");
+    else
+        printf("|%c  |  |?  |\n", card[0]);
+    switch (card[1])
+    {
+    case 'd':
+        printf("| ♦ |  ");
+        break;
+    case 'h':
+        printf("| ♥ |  ");
+        break;
+    case 's':
+        printf("| ♠ |  ");
+        break;
+    case 'c':
+        printf("| ♣ |  ");
+        break;
+    default:
+        break;
+    }
+    printf("| ? |\n");
+    if (r == 'T')
+        printf("|_10|  |__?|\n");
+    else
+        printf("|__%c|  |__?|\n", card[0]);
 }
 
 void deal_card(char deck[DECK_SIZE][CARD_SIZE], char card[CARD_SIZE]) // deals a single card

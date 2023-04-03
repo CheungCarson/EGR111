@@ -15,11 +15,13 @@ int main()
     // intro
     // while loop that runs until players are done
     // deal hands
-    // while loop that runs until one hits 21 or both bust or both pass
+    // while loop that runs until player hits 21 or busts or stands
     // print hands
-    // non dealer turn
-    // dealer turn
-    // checks for bust
+    // checks for bust or blackjack
+    // player turn
+    // checks for bust or blackjack
+    // while loop that runs until dealer is equal to or over 17 points
+
     // Do you want to play again?
     // goodbye
 
@@ -30,13 +32,12 @@ int main()
     deal_hand(deck, dealer_hand, START_HAND);
     deal_hand(deck, player_hand, START_HAND);
     print_table(dealer_hand, player_hand, dealer_cards, player_cards);
-    // printf("🂡");
+
     // while(!done)
     // {
     //     deck_factory(deck);
     //     deal_hand(deck, dealer_hand, START_HAND);
     //     deal_hand(deck, player_hand, START_HAND);
-
     //     while (!round_done)
     //     {
     //         print_table(dealer_hand, player_hand, dealer_cards, player_cards);

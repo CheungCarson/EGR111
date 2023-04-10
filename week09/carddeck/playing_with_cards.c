@@ -4,34 +4,69 @@
 
 int main()
 {
-    bool dealer_win = false, player_win = false;
     int dealer_cards = 2, player_cards = 2;
     char deck[DECK_SIZE][CARD_SIZE];
     char dealer_hand[10][CARD_SIZE], player_hand[10][CARD_SIZE];
     int score;
-    bool done = false, round_done = false;
+    bool player_done = false; // true for testing purposes
+    int d_score = 0, p_score = 0;
+
+    // bool done = false, round_done = false;
     // two players need to be created
     // card counters for both players
     // intro
-    // while loop that runs until players are done
+    // while loop that runs until player is done
     // deal hands
-    // while loop that runs until player hits 21 or busts or stands
-    // print hands
+    // while loop that runs until player (hits 21 or busts) or stands
+    // print table
     // checks for bust or blackjack
     // player turn
-    // checks for bust or blackjack
     // while loop that runs until dealer is equal to or over 17 points
 
     // Do you want to play again?
     // goodbye
 
-    intro();
+    // intro();
 
-    deck_factory(deck);
-    shuffle(deck);
-    deal_hand(deck, dealer_hand, START_HAND);
-    deal_hand(deck, player_hand, START_HAND);
-    print_table(dealer_hand, player_hand, dealer_cards, player_cards);
+    // deck_factory(deck);
+    // shuffle(deck);
+    // deal_hand(deck, dealer_hand, START_HAND);
+    // deal_hand(deck, player_hand, START_HAND);
+    // print_table(dealer_hand, player_hand, dealer_cards, player_cards, player_done);
+
+    // while(get_hand_value(dealer_hand, dealer_cards) < 17) //Dealer's play
+    // {
+    //     deal_card(deck, dealer_hand[dealer_cards], &dealer_cards);
+    //     print_table(dealer_hand, player_hand, dealer_cards, player_cards, player_done);
+    // }
+
+    char input = '\0';
+    while (input != 'N')
+    {
+        intro(); // Setup
+        deck_factory(deck);
+        shuffle(deck);
+        deal_hand(deck, dealer_hand, START_HAND);
+        deal_hand(deck, player_hand, START_HAND);
+
+        while (!player_done) // Player's play
+        {
+            print_table(dealer_hand, player_hand, dealer_cards, player_cards, player_done);
+            // player_done = bust_blackjack(player_hand, player_cards);
+            if (get_hand_value(player_hand, player_cards) >= 21)
+                player_done = true;
+            else
+                player_done = player_turn(deck, player_hand, &player_cards);
+        }
+
+        while (get_hand_value(dealer_hand, dealer_cards) < 17) // Dealer's play
+        {
+            deal_card(deck, dealer_hand[dealer_cards], &dealer_cards);
+            print_table(dealer_hand, player_hand, dealer_cards, player_cards, player_done);
+        }
+
+        round_over(dealer_hand, player_hand, dealer_cards, player_cards, &d_score, &p_score); // Untested end of round
+    }
 
     // while(!done)
     // {

@@ -2,6 +2,7 @@
     "files.associations": {
         "xmemory": "c",
         "xutility": "c",
-        "carddeck.h": "c"
+        "carddeck.h": "c",
+        "string.h": "c"
     }
 }

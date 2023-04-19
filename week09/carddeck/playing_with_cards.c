@@ -4,114 +4,98 @@
 
 int main()
 {
-    int dealer_cards = 2, player_cards = 2;
     char deck[DECK_SIZE][CARD_SIZE];
     char dealer_hand[10][CARD_SIZE], player_hand[10][CARD_SIZE];
-    int score;
-    bool player_done = false; // true for testing purposes
-    int d_score = 0, p_score = 0;
-
-    // bool done = false, round_done = false;
-    // two players need to be created
-    // card counters for both players
-    // intro
-    // while loop that runs until player is done
-    // deal hands
-    // while loop that runs until player (hits 21 or busts) or stands
-    // print table
-    // checks for bust or blackjack
-    // player turn
-    // while loop that runs until dealer is equal to or over 17 points
-
-    // Do you want to play again?
-    // goodbye
-
-    // intro();
-
-    // deck_factory(deck);
-    // shuffle(deck);
-    // deal_hand(deck, dealer_hand, START_HAND);
-    // deal_hand(deck, player_hand, START_HAND);
-    // print_table(dealer_hand, player_hand, dealer_cards, player_cards, player_done);
-
-    // while(get_hand_value(dealer_hand, dealer_cards) < 17) //Dealer's play
-    // {
-    //     deal_card(deck, dealer_hand[dealer_cards], &dealer_cards);
-    //     print_table(dealer_hand, player_hand, dealer_cards, player_cards, player_done);
-    // }
+    int score, bet_amount, bank = 0;
+    int d_wins = 0, p_wins = 0;
 
     char input = '\0';
+    intro();
     while (input != 'N')
     {
-        intro(); // Setup
-        deck_factory(deck);
+        int dealer_card_count = 2, player_card_count = 2;
+        bool players_done = false;
+        bool player_stand = false;
+        bool dealer_bust = false, player_bust = false;
+        bool dealer_blackjack = false, player_blackjack = false;
+        input = '\0'; // Resetting to NULL so end game loop runs again
+
+        deck_factory(deck); // Setup
         shuffle(deck);
         deal_hand(deck, dealer_hand, START_HAND);
         deal_hand(deck, player_hand, START_HAND);
 
-        while (!player_done) // Player's play
+        print_table(dealer_hand, player_hand, dealer_card_count, player_card_count, players_done);
+
+        player_blackjack = blackjack_check(player_hand, player_card_count);
+
+        while (!player_blackjack && !player_bust && !player_stand) // Player's play
         {
-            print_table(dealer_hand, player_hand, dealer_cards, player_cards, player_done);
-            // player_done = bust_blackjack(player_hand, player_cards);
-            if (get_hand_value(player_hand, player_cards) >= 21)
-                player_done = true;
+            int hand_value = get_hand_value(player_hand, player_card_count);
+            // print_table(dealer_hand, player_hand, dealer_card_count, player_card_count, player_done);
+            // bet_amount = input_bets();
+            if (hand_value == 21)
+                player_blackjack = true;
+
+            else if (hand_value > 21)
+                player_bust = true;
+
             else
-                player_done = player_turn(deck, player_hand, &player_cards);
+                player_stand = player_turn(deck, player_hand, &player_card_count);
+
+            print_table(dealer_hand, player_hand, dealer_card_count, player_card_count, players_done);
         }
 
-        while (get_hand_value(dealer_hand, dealer_cards) < 17) // Dealer's play
+        while (get_hand_value(dealer_hand, dealer_card_count) < 17) // Dealer's play
         {
-            deal_card(deck, dealer_hand[dealer_cards], &dealer_cards);
-            print_table(dealer_hand, player_hand, dealer_cards, player_cards, player_done);
+            deal_card(deck, dealer_hand[dealer_card_count], &dealer_card_count);
+            print_table(dealer_hand, player_hand, dealer_card_count, player_card_count, players_done);
+            getchar(); // pauses here until enter is pressed
+        }
+        // round_over(dealer_hand, player_hand, dealer_card_count, player_card_count, &d_wins, &p_wins);
+
+        for (int i = 0; i < 2 /*number of players + 1*/; i++)
+        {
+            if (!player_bust && !dealer_bust)
+            {
+                win_check(dealer_hand, player_hand, dealer_card_count, player_card_count, &d_wins, &p_wins);
+            }
         }
 
-        round_over(dealer_hand, player_hand, dealer_cards, player_cards, &d_score, &p_score); // Untested end of round
+        while (input != 'Y' && input != 'N') // Ask if the player is done
+        {
+            printf("Would you like to play again? (Y/N)\n");
+            input = toupper(getchar());
+            if (input != 'Y' && input != 'N')
+                printf("Invalid entry!\n");
+            getchar();
+        }
     }
-
-    // while(!done)
-    // {
-    //     deck_factory(deck);
-    //     deal_hand(deck, dealer_hand, START_HAND);
-    //     deal_hand(deck, player_hand, START_HAND);
-    //     while (!round_done)
-    //     {
-    //         print_table(dealer_hand, player_hand, dealer_cards, player_cards);
-    //     }
-
-    // }
-    // intro();
-    // deck_factory(deck);
-    // shuffle(deck);
-
-    // deal_card(deck, card);
-
-    // deal_hand(deck, hand, START_HAND);
-
-    // score = get_hand_value(hand, 10);
-
-    // for(int i = 0; i < DECK_SIZE; i++)
-    // {
-    //     printf("%c", deck[i][0]);
-    //     printf("%c", deck[i][1]);
-    //     printf("\n");
-    // }
-
-    // printf("Your card is: %c%c\n", card[0], card[1]);
-    // printf("Your hand contains: %c%c %c%c\n", hand[0][0], hand[0][1], hand[1][0], hand[1][1]);
-    // printf("Your hand is worth %d\n", score);
-
-    // two players need to be created
-    // card counters for both players
-    // intro
-    // while loop that runs until players are done
-    // while loop that runs until one hits 21 or both bust or both pass
-    // deal hands
-    // print hands
-    // non dealer turn
-    // dealer turn
-    // checks for bust
-    // Do you want to play again?
-    // goodbye
+    printf("Thanks for playing!"); // Bye
 }
 
 #endif
+
+// all the setup
+// check blackjack on all
+// player turn(s)
+// dealer turn
+// check for busts
+// check for blackjacks
+// determine winner
+// index wins
+// print end of round screen
+
+// if (dealer did not bust)
+// for(each player)
+// get score
+// if did not bust
+// print result
+
+// set current player to player[i]
+// while players done is false
+// print table
+// player[i] turn
+//  all the checks
+// i++
+// if i is too big i = 1

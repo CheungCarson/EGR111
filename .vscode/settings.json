@@ -4,6 +4,8 @@
         "xutility": "c",
         "carddeck.h": "c",
         "string.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "stdbool.h": "c",
+        "stdio.h": "c"
     }
 }

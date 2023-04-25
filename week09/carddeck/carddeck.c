@@ -37,42 +37,58 @@ void intro()
     getchar(); // pauses here until enter is pressed
 }
 
-void print_table(char dealer_hand[10][CARD_SIZE], char player_hand[10][CARD_SIZE], int d_cards, int p_cards, bool dealer_turn)
+void print_table(char player_hands[MAX_PLAYERS][MAX_CARDS][CARD_SIZE], bool dealer_turn)
 {
     printf("\e[1;1H\e[2J"); // Clear Screen
 
     printf("Dealer's hand:\n");
 
-    print_hand(dealer_hand, d_cards, !dealer_turn); // Prints full hand
+    print_hand(player_hands[0], /*d_cards,*/ !dealer_turn); // Prints full hand
 
     if (dealer_turn) // If the dealers card is still hidden, it will only score the first card
-        printf("\nScore: %d\n", get_hand_value(dealer_hand, d_cards));
+        printf("\nScore: %d\n", get_hand_value(player_hands[0] /*d_cards*/));
     else
-        printf("\nScore: %d\n", get_hand_value(dealer_hand, 1));
+        printf("\nScore: %d\n", get_card_value(player_hands[0][0]));
 
-    printf("\nPlayer's hand:\n"); // Prints players cards
-    print_hand(player_hand, p_cards, false);
-    printf("\nScore: %d\n", get_hand_value(player_hand, p_cards));
+    for (int i = 1; i <= MAX_PLAYERS; i++)
+    {
+        if (player_hands[i][0][0] == '\0')
+        {
+            break;
+        }
+        else
+        {
+            printf("\nPlayer's hand:\n"); // Prints players cards
+            print_hand(player_hands[i], /*p_cards,*/ false);
+            printf("\nScore: %d\n", get_hand_value(player_hands[i] /*, p_cards*/));
+        }
+    }
 }
 
-bool player_turn(char deck[DECK_SIZE][CARD_SIZE], char hand[][CARD_SIZE], int *card_cnt) // Gets hit or stand input from player and take the respective action
+bool player_turn(char deck[DECK_SIZE][CARD_SIZE], char hand[][CARD_SIZE]) // Gets hit or stand input from player and take the respective action
 {
     char input = '\0';
 
     while (input != 'H' && input != 'S') // Gets input and validates
     {
         printf("Hit(H) or Stand(S)?");
-        input = toupper(getchar());
+        input = getchar();
         if (input != 'H' && input != 'S')
-            printf("Invalid entry!\n");
+            printf(" Invalid entry!\n");
         printf("\n");
         getchar();
     }
 
     if (input == 'H') // either hits or stands
     {
-        deal_card(deck, hand[*card_cnt], card_cnt); // Adds card to hand
-        return false;
+        for (int i = 0; i < MAX_CARDS; i++) // finds first empty card slot
+        {
+            if (hand[i][0] == '\0')
+            {
+                deal_card(deck, hand[i]); // Adds card to hand
+                return false;
+            }
+        }
     }
     else
         return true; // If returns true then it brings the game to an end
@@ -80,17 +96,17 @@ bool player_turn(char deck[DECK_SIZE][CARD_SIZE], char hand[][CARD_SIZE], int *c
 
 void deck_factory(char deck[DECK_SIZE][CARD_SIZE]) // Creates deck
 {
-    int cards = 0;            // counts cards created
-    while (cards < DECK_SIZE) // while there are less than 52 cards
+    int cards_made = 0;            // counts cards created
+    while (cards_made < DECK_SIZE) // while there are less than 52 cards
     {
         for (int s = 0; s < (sizeof(SUITS) / sizeof(SUITS[0])); s++) // indexes through suits
         {
             for (int r = 0; r < (sizeof(RANKS) / sizeof(RANKS[0])); r++) // indexes through ranks
             {
-                deck[cards][0] = RANKS[r];
-                deck[cards][1] = SUITS[s];
-                deck[cards][2] = '\0';
-                cards++;
+                deck[cards_made][0] = RANKS[r];
+                deck[cards_made][1] = SUITS[s];
+                deck[cards_made][2] = '\0';
+                cards_made++;
             }
         }
     }
@@ -114,14 +130,24 @@ void shuffle(char deck[DECK_SIZE][CARD_SIZE]) // shuffles deck
     }
 }
 
-void print_hand(char hand[][CARD_SIZE], int handSize, bool hide_card) // Prints full hand of cards
+void print_hand(char hand[][CARD_SIZE], bool hide_card) // Prints full hand of cards
 {
-    for (int i = 0; i < handSize; i++) // Prints top row for every card
+    for (int i = 0; i < MAX_CARDS; i++) // Prints top row for every card
+    {
+        if (hand[i][0] == '\0') // breaks if there is no card
+        {
+            break;
+        }
         printf(" ___   ");
+    }
     printf("\n");
 
-    for (int i = 0; i < handSize; i++) // Prints second row for every card
+    for (int i = 0; i < MAX_CARDS; i++) // Prints second row for every card
     {
+        if (hand[i][0] == '\0') // breaks if there is no card
+        {
+            break;
+        }
         if (hide_card && i == 1) // For if it is the dealers hand and the player isn't done
             printf("|?  |  ");
 
@@ -133,8 +159,12 @@ void print_hand(char hand[][CARD_SIZE], int handSize, bool hide_card) // Prints 
     }
     printf("\n");
 
-    for (int i = 0; i < handSize; i++) // Prints middle row
+    for (int i = 0; i < MAX_CARDS; i++) // Prints middle row
     {
+        if (hand[i][0] == '\0') // breaks if there is no card
+        {
+            break;
+        }
         if (hide_card && i == 1) // For if it is the dealers hand and the player isn't done
             printf("| ? |  ");
 
@@ -159,8 +189,12 @@ void print_hand(char hand[][CARD_SIZE], int handSize, bool hide_card) // Prints 
     }
     printf("\n");
 
-    for (int i = 0; i < handSize; i++) // Prints bottom row for all cards
+    for (int i = 0; i < MAX_CARDS; i++) // Prints bottom row for all cards
     {
+        if (hand[i][0] == '\0') // breaks if there is no card
+        {
+            break;
+        }
         if (hide_card && i == 1) // For if it is the dealers hand and the player isn't done
             printf("|__?|  ");
 
@@ -173,7 +207,7 @@ void print_hand(char hand[][CARD_SIZE], int handSize, bool hide_card) // Prints 
     printf("\n");
 }
 
-void deal_card(char deck[DECK_SIZE][CARD_SIZE], char card[CARD_SIZE], int *cards) // deals a single card
+void deal_card(char deck[DECK_SIZE][CARD_SIZE], char card[CARD_SIZE] /*, int *cards*/) // deals a single card
 {
     for (int i = 0; i < DECK_SIZE; i++) // checks through deck until first non-blank card
     {
@@ -186,13 +220,13 @@ void deal_card(char deck[DECK_SIZE][CARD_SIZE], char card[CARD_SIZE], int *cards
             deck[i][0] = '\0'; // removes card from deck
             deck[i][1] = '\0';
 
-            *cards += 1; // For some reason *cards++; doesn't work
+            // *cards += 1; // For some reason *cards++; doesn't work
             break;
         }
     }
 }
 
-void deal_hand(char deck[DECK_SIZE][CARD_SIZE], char hand[][CARD_SIZE], int hand_size) // deals a hand of cards
+void deal_hand(char deck[DECK_SIZE][CARD_SIZE], char hand[][CARD_SIZE]) // deals a hand of cards
 {
     for (int i = 0; i < 10; i++) // inits hand to NULL
     {
@@ -215,7 +249,7 @@ void deal_hand(char deck[DECK_SIZE][CARD_SIZE], char hand[][CARD_SIZE], int hand
             deck[i][1] = '\0';
             card_count++;
 
-            if (card_count == hand_size) // ends when enough cards have been dealt
+            if (card_count == 2) // ends when enough cards have been dealt
                 break;
         }
     }
@@ -242,14 +276,21 @@ int get_card_value(char card[CARD_SIZE]) // finds value of single card
     }
 }
 
-int get_hand_value(char hand[][CARD_SIZE], int hand_size) // finds value of hand
+int get_hand_value(char hand[][CARD_SIZE]) // finds value of hand
 {
     int ace_counter = 0, score = 0;
-    for (int i = 0; i < hand_size; i++) // for every card in the hand
+    for (int i = 0; i < MAX_CARDS; i++) // for every card in the hand
     {
-        score += get_card_value(&hand[i][0]); // score the card
-        if (hand[i][0] == 'A')
-            ace_counter++; // adds if ace
+        if (hand[i][0] == '\0')
+        {
+            break;
+        }
+        else
+        {
+            score += get_card_value(&hand[i][0]); // score the card
+            if (hand[i][0] == 'A')
+                ace_counter++; // adds if ace
+        }
     }
     while (ace_counter >= 1 && score > 21) // if bust and one of the cards is an ace
     {
@@ -259,101 +300,90 @@ int get_hand_value(char hand[][CARD_SIZE], int hand_size) // finds value of hand
     return score;
 }
 
-bool blackjack_check(char hand[10][CARD_SIZE], int hand_size)
+bool blackjack_check(char hand[10][CARD_SIZE] /*, int hand_size*/)
 {
-    if (get_hand_value(hand, hand_size) == 21)
-    {
-        return true;
-    }
-    return false;
-}
 
-bool check_player_bust(char player_hand[10][CARD_SIZE], int p_cards) // Runs after the end of each turn to check for busts
-{
-    if (get_hand_value(player_hand, p_cards) > 21) // if player busts
+    for (int i = 0; i < MAX_CARDS; i++)
     {
-        printf("Player busted\n");
-        return true;
-    }
-}
-
-bool check_dealer_bust(char dealer_hand[10][CARD_SIZE], int d_cards)
-{
-    if (get_hand_value(dealer_hand, d_cards) > 21) // if dealer busts
-    {
-        printf("Dealer busted\n");
-        return true;
+        if (hand[i][0] == '\0')
+        {
+            break;
+        }
+        else
+        {
+            if (get_hand_value(hand) == 21)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }
 
-void round_over(char dealer_hand[10][CARD_SIZE], char player_hand[10][CARD_SIZE], int d_cards, int p_cards, int *d_wins, int *p_wins) // declares winner and indexes the scores
+// bool check_player_bust(char player_hand[10][CARD_SIZE]/*, int p_cards*/) // Runs after the end of each turn to check for busts
+// {
+//     for (int i = 0; i < MAX_CARDS; i++)
+//     {
+//         if (player_hand[i] == '\0');
+//     }
+//     if (get_hand_value(player_hand) > 21) // if player busts
+//     {
+//         printf("Player busted\n");
+//         return true;
+//     }
+// }
+
+bool check_bust(char player_hands[MAX_PLAYERS][MAX_CARDS][CARD_SIZE], int *d_wins, int *p_wins /*, int d_cards*/)
 {
-    bool dealerbust = false, playerbust = false, dealerwin = false, playerwin = false; // blackjack = false;
-    int dealer_hand_value = get_hand_value(dealer_hand, d_cards);
-    int player_hand_value = get_hand_value(player_hand, p_cards);
+    // for (int i = 0; i < MAX_CARDS; i++)
+    // {
+    //     if (dealer_hand[i][0] == '\0')
+    //     {
+    //         return false;
+    //     }
+    //     else
+    //     {
+    //         if (get_hand_value(dealer_hand) > 21) // if dealer busts
+    //         {
+    //             if (dealer_turn)
+    //                 printf("Dealer busted\n");
 
-    if (dealer_hand_value > 21) // if dealer busts
-    {
-        printf("Dealer busted\n");
-        dealerbust = true;
-    }
-    else
-        printf("Dealer score: %d\n", dealer_hand_value); // Print score
-
-    if (get_hand_value(player_hand, p_cards) > 21) // if player busts
-    {
-        printf("Player busted\n");
-        playerbust = true;
-    }
-    else
-        printf("Player score: %d\n", player_hand_value); // Print score
-
-    if (playerbust && !dealerbust)                                  // If the dealer busted
-        *d_wins += 1;                                               //++ doesn't seem to work on pointers ¯\_(ツ)_/¯
-    else if (dealer_hand_value >= player_hand_value && !dealerbust) // if dealer wins
-    {
-        printf("\nDealer wins %d > %d\n", dealer_hand_value, player_hand_value);
-        *d_wins += 1;
-        dealerwin = true;
-    }
-
-    if (!playerbust && dealerbust) // If the player busted
-        *p_wins += 1;
-    else if (dealer_hand_value < player_hand_value && !playerbust) // if player wins
-    {
-        printf("\nPlayer wins %d > %d\n", player_hand_value, dealer_hand_value);
-        *p_wins += 1;
-        playerwin = true;
-    }
-
-    printf("\nDealer's wins: %d\nPlayer's wins: %d\n", *d_wins, *p_wins); // prints current scores
-    // blackjack = blackjack_check(player_hand[10][CARD_SIZE], p_cards);
-    // bet_payouts(playerwin, dealerwin, blackjack);
-    getchar(); // Pauses until player presses enter
+    //             else
+    //                 printf("Player Busted\n");
+    //             return true;
+    //         }
+    //     }
+    // }
 }
 
-void win_check(char dealer_hand[10][CARD_SIZE], char player_hand[10][CARD_SIZE], int d_cards, int p_cards, int *d_wins, int *p_wins)
+void win_check(char player_hands[MAX_PLAYERS][MAX_CARDS][CARD_SIZE], int *d_wins, int *p_wins)
 {
-    int dealer_hand_value = get_hand_value(dealer_hand, p_cards);
-    int player_hand_value = get_hand_value(player_hand, d_cards);
+    int dealer_hand_value = get_hand_value(player_hands[0]);
+    int player_hand_value = get_hand_value(player_hands[1]);
 
     if (dealer_hand_value > player_hand_value)
     {
         printf("\nDealer wins %d > %d\n", dealer_hand_value, player_hand_value);
         *d_wins += 1;
     }
-    else if (dealer_hand_value < player_hand_value)
+    else if (dealer_hand_value < player_hand_value) // checks to see if player has higher score than dealer
     {
         printf("\nPlayer wins %d > %d\n", player_hand_value, dealer_hand_value);
-        printf("Player score: %d\n", player_hand_value);
         *p_wins += 1;
     }
+    else if (dealer_hand_value == player_hand_value)
+    {
+        printf("\nDealer wins ties %d = %d\n", dealer_hand_value, player_hand_value);
+        *d_wins += 1;
+    }
+    printf("Dealer Wins: %d\n", *d_wins);
+    printf("Player Wins: %d\n", *p_wins);
 }
 
-int input_bets()
+int input_bets() // might be able to be a void function depending on how we implement multiplayer
 {
-    int bet_amount, bet_range = 50;
-    printf("Your betting range is $0-$50");
+    int bet_amount, bet_range;
+    printf("How much money would you like to bet? (You have $%d)", bet_range); // bet range is equal to the players current bank
     scanf("%d", &bet_amount);
     while (bet_amount > bet_range)
     {
@@ -363,33 +393,36 @@ int input_bets()
     return bet_amount;
 }
 
-/* void bet_payouts(bool playerwin, bool dealerwin, bool blackjack, int bet_amount, int bank) //needs to know if player won or lost. If lost then check for blackjack
+void bet_payouts(bool playerwin, bool blackjack, int bet_amount, int bank) // needs to know if player won or lost. If lost then check for blackjack
 {
     if (playerwin == false)
     {
         bank -= bet_amount;
     }
-    else if ()
+    else if (playerwin == true)
     {
-
+        if (blackjack == true)
+        {
+            bank = bank + (bet_amount * 1.5);
+        }
+        else
+        {
+            bank += bet_amount;
+        }
     }
-
-    printf("\nDealer's wins: %d\nPlayer's wins: %d\n", *d_wins, *p_wins); //prints current scores
-    getchar();
 }
-    //if (lost)
-    //{
-        //Player loses their bet money
-    //}
-    //else if (win)
-    //{
-        //if (blackjack == true)
-        //{
-            //bet = bet + (bet * 1.5)
-        //}
-        //else
-        //{
-            //bet = bet * 2
-        //}
-    //}
-}*/
+
+int get_player_count()
+{
+    int player_count;
+    while (player_count < 0 || player_count > 4)
+        ;
+    {
+        printf("How many players?\n");
+        scanf("%d\n", &player_count);
+
+        if (player_count < 0 || player_count > 4)
+            printf("Invalid Input\n\n");
+    }
+    return player_count;
+}

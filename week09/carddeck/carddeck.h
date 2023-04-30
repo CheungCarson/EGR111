@@ -15,8 +15,8 @@ const char SUITS[] = {'c', 'd', 'h', 's'};
 const char RANKS[] = {'2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'};
 
 void intro();
-int input_bets();
-bool player_turn(char deck[DECK_SIZE][CARD_SIZE], char hand[][CARD_SIZE]);
+int input_bets(int player_money[MAX_PLAYERS - 1][2], int player_count);
+bool player_turn(char deck[DECK_SIZE][CARD_SIZE], char hand[][CARD_SIZE], int player_index);
 void deck_factory(char deck[DECK_SIZE][CARD_SIZE]); // creates deck of DECK_SIZE
 void shuffle(char deck[DECK_SIZE][CARD_SIZE]);
 void deal_card(char deck[DECK_SIZE][CARD_SIZE], char card[CARD_SIZE]);   // deals a single card; //returns first non-blank card in deck
@@ -25,9 +25,7 @@ int get_card_value(char card[CARD_SIZE]);
 int get_hand_value(char hand[][CARD_SIZE]);
 void print_table(char player_hands[MAX_PLAYERS][MAX_CARDS][CARD_SIZE], bool dealer_turn);
 void print_hand(char hand[][CARD_SIZE], bool hide_card);
-void win_check(char player_hands[MAX_PLAYERS][MAX_CARDS][CARD_SIZE], int *d_wins, int *p_wins);
+void win_check(char player_hands[MAX_PLAYERS][MAX_CARDS][CARD_SIZE], int player_index, bool *player_won);
 bool blackjack_check(char hand[10][CARD_SIZE]);
-void bet_payouts(bool playerwin, bool dealerwin, bool blackjack, int bet_amount, int bank);
-bool check_bust(char dealer_hand[MAX_CARDS][CARD_SIZE], bool dealer_turn, int *d_wins, int *p_wins /*, int d_cards*/);
-// bool check_player_bust(char player_hand[10][CARD_SIZE], int p_cards);
+void bet_payouts(int player_money[MAX_PLAYERS - 1][2], bool blackjack, int player_count, bool player_won, int i);
 int get_player_count();

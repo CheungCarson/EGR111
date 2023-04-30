@@ -43,14 +43,13 @@ void print_table(char player_hands[MAX_PLAYERS][MAX_CARDS][CARD_SIZE], bool deal
 
     printf("Dealer's hand:\n");
 
-    print_hand(player_hands[0], /*d_cards,*/ !dealer_turn); // Prints full hand
-
-    if (dealer_turn) // If the dealers card is still hidden, it will only score the first card
+    print_hand(player_hands[0], !dealer_turn); // Print dealer hand
+    if (dealer_turn)                           // If the dealers card is still hidden, it will only score the first card
         printf("\nScore: %d\n", get_hand_value(player_hands[0] /*d_cards*/));
     else
         printf("\nScore: %d\n", get_card_value(player_hands[0][0]));
 
-    for (int i = 1; i <= MAX_PLAYERS; i++)
+    for (int i = 1; i <= MAX_PLAYERS; i++) // Print player hands
     {
         if (player_hands[i][0][0] == '\0')
         {
@@ -58,25 +57,25 @@ void print_table(char player_hands[MAX_PLAYERS][MAX_CARDS][CARD_SIZE], bool deal
         }
         else
         {
-            printf("\nPlayer's hand:\n"); // Prints players cards
-            print_hand(player_hands[i], /*p_cards,*/ false);
-            printf("\nScore: %d\n", get_hand_value(player_hands[i] /*, p_cards*/));
+            printf("\nPlayer %d hand:\n", i); // Prints players cards
+            print_hand(player_hands[i], false);
+            printf("\nScore: %d\n", get_hand_value(player_hands[i]));
         }
     }
 }
 
-bool player_turn(char deck[DECK_SIZE][CARD_SIZE], char hand[][CARD_SIZE]) // Gets hit or stand input from player and take the respective action
+bool player_turn(char deck[DECK_SIZE][CARD_SIZE], char hand[][CARD_SIZE], int player_index) // Gets hit or stand input from player and take the respective action
 {
-    char input = '\0';
-
-    while (input != 'H' && input != 'S') // Gets input and validates
+    char input;
+    while (1) // Gets input and validates
     {
+        printf("\nPlayer %d's turn:\n", player_index);
         printf("Hit(H) or Stand(S)?");
-        input = getchar();
-        if (input != 'H' && input != 'S')
-            printf(" Invalid entry!\n");
-        printf("\n");
+        input = toupper(getchar());
         getchar();
+        if (input == 'H' || input == 'S')
+            break;
+        printf("Invalid entry!\n\n");
     }
 
     if (input == 'H') // either hits or stands
@@ -228,7 +227,7 @@ void deal_card(char deck[DECK_SIZE][CARD_SIZE], char card[CARD_SIZE] /*, int *ca
 
 void deal_hand(char deck[DECK_SIZE][CARD_SIZE], char hand[][CARD_SIZE]) // deals a hand of cards
 {
-    for (int i = 0; i < 10; i++) // inits hand to NULL
+    for (int i = 0; i < 10; i++)
     {
         hand[i][0] = '\0';
         hand[i][1] = '\0';
@@ -320,109 +319,82 @@ bool blackjack_check(char hand[10][CARD_SIZE] /*, int hand_size*/)
     }
 }
 
-// bool check_player_bust(char player_hand[10][CARD_SIZE]/*, int p_cards*/) // Runs after the end of each turn to check for busts
-// {
-//     for (int i = 0; i < MAX_CARDS; i++)
-//     {
-//         if (player_hand[i] == '\0');
-//     }
-//     if (get_hand_value(player_hand) > 21) // if player busts
-//     {
-//         printf("Player busted\n");
-//         return true;
-//     }
-// }
-
-bool check_bust(char player_hands[MAX_PLAYERS][MAX_CARDS][CARD_SIZE], int *d_wins, int *p_wins /*, int d_cards*/)
-{
-    // for (int i = 0; i < MAX_CARDS; i++)
-    // {
-    //     if (dealer_hand[i][0] == '\0')
-    //     {
-    //         return false;
-    //     }
-    //     else
-    //     {
-    //         if (get_hand_value(dealer_hand) > 21) // if dealer busts
-    //         {
-    //             if (dealer_turn)
-    //                 printf("Dealer busted\n");
-
-    //             else
-    //                 printf("Player Busted\n");
-    //             return true;
-    //         }
-    //     }
-    // }
-}
-
-void win_check(char player_hands[MAX_PLAYERS][MAX_CARDS][CARD_SIZE], int *d_wins, int *p_wins)
+void win_check(char player_hands[MAX_PLAYERS][MAX_CARDS][CARD_SIZE], int player_index, bool *player_won)
 {
     int dealer_hand_value = get_hand_value(player_hands[0]);
-    int player_hand_value = get_hand_value(player_hands[1]);
+    int player_hand_value = get_hand_value(player_hands[player_index]);
 
     if (dealer_hand_value > player_hand_value)
     {
-        printf("\nDealer wins %d > %d\n", dealer_hand_value, player_hand_value);
-        *d_wins += 1;
+        printf("Dealer beats player %d! %d > %d\n", player_index, dealer_hand_value, player_hand_value);
+        *player_won = false;
     }
     else if (dealer_hand_value < player_hand_value) // checks to see if player has higher score than dealer
     {
-        printf("\nPlayer wins %d > %d\n", player_hand_value, dealer_hand_value);
-        *p_wins += 1;
+        printf("Player %d wins! %d > %d\n", player_index, player_hand_value, dealer_hand_value);
+        *player_won = true;
     }
     else if (dealer_hand_value == player_hand_value)
     {
-        printf("\nDealer wins ties %d = %d\n", dealer_hand_value, player_hand_value);
-        *d_wins += 1;
+        printf("Dealer beats player %d! tie %d = %d\n", player_index, dealer_hand_value, player_hand_value);
+        *player_won = false;
     }
-    printf("Dealer Wins: %d\n", *d_wins);
-    printf("Player Wins: %d\n", *p_wins);
 }
 
-int input_bets() // might be able to be a void function depending on how we implement multiplayer
+int input_bets(int player_money[MAX_PLAYERS - 1][2], int player_count)
+// might be able to be a void function depending on how we implement multiplayer.
+// This will be called at the beginner after the intro and before print table.
 {
     int bet_amount, bet_range;
-    printf("How much money would you like to bet? (You have $%d)", bet_range); // bet range is equal to the players current bank
-    scanf("%d", &bet_amount);
-    while (bet_amount > bet_range)
+    for (int i = 0; i < player_count - 1; i++)
     {
-        printf("You can't bet that much. Try again");
+        bet_range = player_money[i][0];
+        printf("Player %d, How much would you like to bet? (Your betting cap is $%d) $", i + 1, player_money[i][0]);
         scanf("%d", &bet_amount);
+        while (bet_amount > bet_range)
+        {
+            printf("You can't bet that much. Try again. $");
+            scanf("%d", &bet_amount);
+        }
+        player_money[i][1] = bet_amount;
     }
+    getchar();
     return bet_amount;
 }
 
-void bet_payouts(bool playerwin, bool blackjack, int bet_amount, int bank) // needs to know if player won or lost. If lost then check for blackjack
+void bet_payouts(int player_money[MAX_PLAYERS - 1][2], bool blackjack, int player_count, bool player_won, int i) // needs to know if player won or lost. If lost then check for blackjack
 {
-    if (playerwin == false)
+    if (player_won == false) // players loses
     {
-        bank -= bet_amount;
+        player_money[i][0] -= player_money[i][1]; // Subtracts bet amount from bank
     }
-    else if (playerwin == true)
+    else if (player_won == true) // players win
     {
-        if (blackjack == true)
+        if (blackjack == true) // players win by blackjack
         {
-            bank = bank + (bet_amount * 1.5);
+            player_money[i][0] += (player_money[i][1] * 1.5); // If blackjack then players get 1.5 their bet amount
         }
-        else
+        else // Not won by blackjack
         {
-            bank += bet_amount;
+            player_money[i][0] += player_money[i][1]; // Adds bet amount to bank
         }
     }
+
+    printf("Player %d's Bank: $%d\n", i + 1, player_money[i][0]);
+    printf("--------------------\n");
 }
 
 int get_player_count()
 {
     int player_count;
-    while (player_count < 0 || player_count > 4)
-        ;
+    while (1)
     {
-        printf("How many players?\n");
-        scanf("%d\n", &player_count);
-
-        if (player_count < 0 || player_count > 4)
-            printf("Invalid Input\n\n");
+        printf("How many players?(1-4)\n");
+        scanf("%d", &player_count);
+        if (player_count > 0 || player_count < 5)
+            break;
+        printf("Invalid Input\n\n");
     }
-    return player_count;
+    getchar();
+    return player_count + 1;
 }

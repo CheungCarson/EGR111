@@ -5,63 +5,88 @@
 int main()
 {
     char player_hands[MAX_PLAYERS][MAX_CARDS][CARD_SIZE]; //[players (0 is dealer)][card index][card characteristics]
+    int player_money[MAX_PLAYERS - 1][2] = {
+        // player_money[bank][bets]
+        {
+            20,
+            0,
+        },
+        {
+            20,
+            0,
+        },
+        {
+            20,
+            0,
+        },
+        {
+            20,
+            0,
+        },
+    };
     char deck[DECK_SIZE][CARD_SIZE];
     int score, bet_amount, bank = 0;
-    int d_wins = 0, p_wins = 0;
 
     char input = '\0';
     intro();
+    int player_count = get_player_count();
     while (input != 'N')
     {
         bool players_done = false;
         bool player_stand = false;                               // going away
         bool dealer_bust = false, player_bust = false;           // going away
         bool dealer_blackjack = false, player_blackjack = false; // going away
+        bool player_won = false;
+        bool game_over = false;
         int blackjack_count = 0, bust_count = 0, stand_count = 0;
         input = '\0'; // Resetting to NULL so end game loop runs again
 
         deck_factory(deck); // Setup
         shuffle(deck);
-        deal_hand(deck, player_hands[0]);
-        deal_hand(deck, player_hands[1]);
 
-        print_table(player_hands, players_done);
-
-        player_blackjack = blackjack_check(player_hands[1]);
-
-        for (int i = 1; i < MAX_PLAYERS; i++)
+        for (int i = 0; i < MAX_PLAYERS; i++) // inits hands to NULL    Might not need in the end
         {
-            if (player_hands[i][0][0] != '\0')
+            for (int j = 0; j < MAX_CARDS; j++)
             {
-                while (!player_blackjack && !player_bust && !player_stand) // Player's play
-                {
-                    player_blackjack = false;
-                    player_bust = false;
-                    player_stand = false;
-                    // print_table(dealer_hand, player_hand, dealer_card_count, player_card_count, player_done);
-                    // bet_amount = input_bets();
-                    if (get_hand_value(player_hands[i]) == 21)
-                    {
-                        player_blackjack = true;
-                    }
-
-                    else if (get_hand_value(player_hands[i]) > 21)
-                    {
-                        player_bust = true;
-                    }
-
-                    else
-                    {
-                        player_stand = player_turn(deck, player_hands[i]);
-                    }
-
-                    print_table(player_hands, players_done);
-                }
+                player_hands[i][j][0] = '\0';
+                player_hands[i][j][0] = '\0';
+                player_hands[i][j][0] = '\0';
             }
         }
 
-        players_done = true;
+        for (int i = 0; i < player_count; i++) // Deals Hands
+            deal_hand(deck, player_hands[i]);
+
         print_table(player_hands, players_done);
+        input_bets(player_money, player_count);
+
+        for (int i = 1; i < player_count; i++)
+        {
+            while (!player_blackjack && !player_bust && !player_stand) // Player's play
+            {
+                if (get_hand_value(player_hands[i]) == 21)
+                {
+                    player_blackjack = true;
+                }
+
+                else if (get_hand_value(player_hands[i]) > 21)
+                {
+                    player_bust = true;
+                }
+
+                else
+                {
+                    player_stand = player_turn(deck, player_hands[i], i);
+                }
+
+                print_table(player_hands, players_done);
+            }
+            player_blackjack = false;
+            player_bust = false;
+            player_stand = false;
+        }
+
+        players_done = true;
 
         while (get_hand_value(player_hands[0]) < 17 && !player_bust && !player_blackjack) // Dealer's play
         {
@@ -75,75 +100,69 @@ int main()
                     break;
                 }
             }
+
             if (get_hand_value(player_hands[0]) > 21)
             {
                 dealer_bust = true;
             }
         }
-
-        for (int i = 1; i < 2 /*number of players + 1*/; i++) // Checks players fo win
+        if (dealer_bust)
         {
-            if (!player_bust && !dealer_bust)
+            printf("Dealer Busted!\n");
+        }
+
+        for (int i = 1; i < player_count; i++) // Checks players for win
+        {
+            int score = get_hand_value(player_hands[i]);
+
+            if (score > 21)
             {
-                win_check(player_hands, &d_wins, &p_wins);
+                printf("Player %d Busted!\n", i);
+                player_won = false;
             }
-            else if (player_blackjack)
+            else if (score == 21)
             {
-                printf("BLACKJACK!\n");
-                p_wins += 1;
-                printf("Dealer Wins: %d\n", d_wins);
-                printf("Player Wins: %d\n", p_wins);
+                printf("Player %d BLACKJACK!\n", i);
+                player_won = true;
             }
-            else if (player_bust)
+            else
             {
-                printf("Player Busted!\n");
-                d_wins += 1;
-                printf("Dealer Wins: %d\n", d_wins);
-                printf("Player Wins: %d\n", p_wins);
+                if (dealer_bust)
+                {
+                    player_won = true;
+                    printf("Player %d won!\n", i);
+                }
+                else
+                    win_check(player_hands, i, &player_won);
             }
-            else if (dealer_bust)
+
+            bet_payouts(player_money, player_blackjack, player_count, player_won, i - 1);
+        }
+
+        for (int i = 0; i < player_count - 1; i++)
+        {
+            if (player_money[i][0] == 0)
             {
-                printf("Dlayer Busted!\n");
-                p_wins += 1;
-                printf("Dealer Wins: %d\n", d_wins);
-                printf("Player Wins: %d\n", p_wins);
+                printf("Player %d is all out of money!\n", i + 1);
+                game_over = true;
+                input = 'N';
             }
         }
 
-        while (input != 'Y' && input != 'N') // Ask if the player is done
+        if (!game_over)
         {
-            printf("Would you like to play again? (Y/N)\n");
-            input = toupper(getchar());
-            if (input != 'Y' && input != 'N')
+            while (1) // Ask if the player is done
+            {
+                printf("\nWould you like to play again? (Y/N)\n");
+                input = toupper(getchar());
+                getchar();
+                if (input == 'Y' || input == 'N')
+                    break;
                 printf("Invalid entry!\n");
-            getchar();
+            }
         }
     }
-    printf("Thanks for playing!"); // Bye
+    printf("\nThanks for playing!"); // Bye
 }
 
 #endif
-
-// all the setup
-// check blackjack on all
-// player turn(s)
-// dealer turn
-// check for busts
-// check for blackjacks
-// determine winner
-// index wins
-// print end of round screen
-
-// if (dealer did not bust)
-// for(each player)
-// get score
-// if did not bust
-// print result
-
-// set current player to player[i]
-// while players done is false
-// print table
-// player[i] turn
-//  all the checks
-// i++
-// if i is too big i = 1

@@ -34,8 +34,12 @@ void test_can_shuffle_deck()
 {
     // arrange
     char deck[DECK_SIZE][CARD_SIZE];
+    bool pass = true;
+    deck_factory(deck);
     // act
+    shuffle(deck);
 
+    if
     // assert
 }
 

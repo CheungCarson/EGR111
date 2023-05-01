@@ -43,13 +43,13 @@ void print_table(char player_hands[MAX_PLAYERS][MAX_CARDS][CARD_SIZE], bool deal
 
     printf("Dealer's hand:\n");
 
-    print_hand(player_hands[0], !dealer_turn); // Print dealer hand
-    if (dealer_turn)                           // If the dealers card is still hidden, it will only score the first card
+    print_hand(player_hands[0], !dealer_turn); //Print dealer hand
+    if (dealer_turn) // If the dealers card is still hidden, it will only score the first card
         printf("\nScore: %d\n", get_hand_value(player_hands[0] /*d_cards*/));
     else
         printf("\nScore: %d\n", get_card_value(player_hands[0][0]));
 
-    for (int i = 1; i <= MAX_PLAYERS; i++) // Print player hands
+    for (int i = 1; i <= MAX_PLAYERS; i++) //Print player hands
     {
         if (player_hands[i][0][0] == '\0')
         {
@@ -89,8 +89,7 @@ bool player_turn(char deck[DECK_SIZE][CARD_SIZE], char hand[][CARD_SIZE], int pl
             }
         }
     }
-    else
-        return true; // If returns true then it brings the game to an end
+    return true; // If returns true then it brings the game to an end
 }
 
 void deck_factory(char deck[DECK_SIZE][CARD_SIZE]) // Creates deck
@@ -227,7 +226,7 @@ void deal_card(char deck[DECK_SIZE][CARD_SIZE], char card[CARD_SIZE] /*, int *ca
 
 void deal_hand(char deck[DECK_SIZE][CARD_SIZE], char hand[][CARD_SIZE]) // deals a hand of cards
 {
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 10; i++) 
     {
         hand[i][0] = '\0';
         hand[i][1] = '\0';
@@ -301,7 +300,6 @@ int get_hand_value(char hand[][CARD_SIZE]) // finds value of hand
 
 bool blackjack_check(char hand[10][CARD_SIZE] /*, int hand_size*/)
 {
-
     for (int i = 0; i < MAX_CARDS; i++)
     {
         if (hand[i][0] == '\0')
@@ -314,9 +312,9 @@ bool blackjack_check(char hand[10][CARD_SIZE] /*, int hand_size*/)
             {
                 return true;
             }
-            return false;
         }
     }
+    return false;
 }
 
 void win_check(char player_hands[MAX_PLAYERS][MAX_CARDS][CARD_SIZE], int player_index, bool *player_won)
@@ -338,12 +336,13 @@ void win_check(char player_hands[MAX_PLAYERS][MAX_CARDS][CARD_SIZE], int player_
     {
         printf("Dealer beats player %d! tie %d = %d\n", player_index, dealer_hand_value, player_hand_value);
         *player_won = false;
+
     }
 }
 
 int input_bets(int player_money[MAX_PLAYERS - 1][2], int player_count)
 // might be able to be a void function depending on how we implement multiplayer.
-// This will be called at the beginner after the intro and before print table.
+//This will be called at the beginner after the intro and before print table.
 {
     int bet_amount, bet_range;
     for (int i = 0; i < player_count - 1; i++)
@@ -364,19 +363,19 @@ int input_bets(int player_money[MAX_PLAYERS - 1][2], int player_count)
 
 void bet_payouts(int player_money[MAX_PLAYERS - 1][2], bool blackjack, int player_count, bool player_won, int i) // needs to know if player won or lost. If lost then check for blackjack
 {
-    if (player_won == false) // players loses
+    if (player_won == false) //players loses
     {
-        player_money[i][0] -= player_money[i][1]; // Subtracts bet amount from bank
+         player_money[i][0] -= player_money[i][1]; //Subtracts bet amount from bank
     }
-    else if (player_won == true) // players win
+    else if (player_won == true) //players win
     {
-        if (blackjack == true) // players win by blackjack
+        if (blackjack == true) //players win by blackjack
         {
-            player_money[i][0] += (player_money[i][1] * 1.5); // If blackjack then players get 1.5 their bet amount
+            player_money[i][0] += (player_money[i][1] * 1.5); //If blackjack then players get 1.5 their bet amount
         }
-        else // Not won by blackjack
+        else //Not won by blackjack
         {
-            player_money[i][0] += player_money[i][1]; // Adds bet amount to bank
+            player_money[i][0] += player_money[i][1]; //Adds bet amount to bank
         }
     }
 
@@ -392,7 +391,7 @@ int get_player_count()
         printf("How many players?(1-4)\n");
         scanf("%d", &player_count);
         if (player_count > 0 || player_count < 5)
-            break;
+            break;   
         printf("Invalid Input\n\n");
     }
     getchar();
